@@ -1,0 +1,287 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 20% 4%;
+    --foreground: 210 40% 98%;
+
+    --card: 220 20% 7%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 220 20% 8%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 199 89% 48%;
+    --primary-foreground: 220 20% 4%;
+
+    --secondary: 220 20% 12%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 220 20% 15%;
+    --muted-foreground: 215 20% 55%;
+
+    --accent: 270 70% 60%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 20% 18%;
+    --input: 220 20% 15%;
+    --ring: 199 89% 48%;
+
+    --radius: 0.75rem;
+
+     /* Custom P-Note tokens */
+    --gradient-start: 199 89% 48%;
+    --gradient-end: 270 70% 60%;
+    --glow-primary: 199 89% 48%;
+    --glow-accent: 270 70% 60%;
+    
+    --glass-bg: 220 20% 10% / 0.6;
+    --glass-border: 220 20% 25% / 0.3;
+    --glass-shadow: 220 20% 0% / 0.4;
+
+    --surface-1: 220 20% 6%;
+    --surface-2: 220 20% 9%;
+    --surface-3: 220 20% 12%;
+
+    --success: 142 76% 36%;
+    --warning: 38 92% 50%;
+    --info: 199 89% 48%;
+  }
+
+  .dark {
+    --background: 220 20% 4%;
+    --foreground: 210 40% 98%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.3);
+    color: hsl(var(--foreground));
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-[hsl(var(--glass-bg))] backdrop-blur-xl border border-[hsl(var(--glass-border))];
+    box-shadow: 0 8px 32px hsl(var(--glass-shadow)),
+                inset 0 1px 0 hsl(220 20% 30% / 0.1);
+  }
+
+  .glass-hover {
+    @apply glass transition-all duration-300;
+  }
+
+  .glass-hover:hover {
+    @apply bg-[hsl(220_20%_12%/0.7)] border-[hsl(var(--primary)/0.3)];
+    box-shadow: 0 12px 40px hsl(var(--glass-shadow)),
+                0 0 40px hsl(var(--primary) / 0.1),
+                inset 0 1px 0 hsl(220 20% 35% / 0.15);
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-[hsl(var(--gradient-start))] to-[hsl(var(--gradient-end))] bg-clip-text text-transparent;
+  }
+
+  .gradient-border {
+    position: relative;
+    background: hsl(var(--card));
+    border-radius: var(--radius);
+  }
+
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, hsl(var(--gradient-start) / 0.5), hsl(var(--gradient-end) / 0.5));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  .glow {
+    box-shadow: 0 0 40px hsl(var(--glow-primary) / 0.15),
+                0 0 80px hsl(var(--glow-accent) / 0.1);
+  }
+
+  .glow-text {
+    text-shadow: 0 0 40px hsl(var(--glow-primary) / 0.5);
+  }
+
+  .surface-1 {
+    @apply bg-[hsl(var(--surface-1))];
+  }
+
+  .surface-2 {
+    @apply bg-[hsl(var(--surface-2))];
+  }
+
+  .surface-3 {
+    @apply bg-[hsl(var(--surface-3))];
+  }
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-[hsl(var(--gradient-start))] to-[hsl(var(--gradient-end))] 
+           text-primary-foreground font-semibold px-6 py-3 rounded-xl
+           transition-all duration-300 transform hover:scale-[1.02]
+           shadow-lg hover:shadow-xl;
+    box-shadow: 0 4px 20px hsl(var(--primary) / 0.3);
+  }
+
+  .btn-primary:hover {
+    box-shadow: 0 6px 30px hsl(var(--primary) / 0.4);
+  }
+
+  .btn-secondary {
+    @apply glass px-6 py-3 rounded-xl font-medium
+           transition-all duration-300 hover:bg-[hsl(220_20%_15%/0.8)];
+  }
+
+  .input-glass {
+    @apply glass rounded-xl px-4 py-3 outline-none
+           focus:border-[hsl(var(--primary)/0.5)] focus:ring-2 focus:ring-[hsl(var(--primary)/0.2)]
+           transition-all duration-300 placeholder:text-muted-foreground/50;
+  }
+
+  .card-interactive {
+    @apply glass-hover rounded-2xl p-6 cursor-pointer;
+  }
+
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Markdown content styling */
+  .markdown-content {
+    @apply text-foreground leading-relaxed;
+  }
+
+  .markdown-content .md-h1 {
+    @apply text-2xl font-bold mb-4 mt-6 gradient-text;
+  }
+
+  .markdown-content .md-h2 {
+    @apply text-xl font-semibold mb-3 mt-5 text-foreground;
+  }
+
+  .markdown-content .md-h3 {
+    @apply text-lg font-medium mb-2 mt-4 text-foreground;
+  }
+
+  .markdown-content .md-p {
+    @apply mb-4 text-foreground/90;
+  }
+
+  .markdown-content .md-ul,
+  .markdown-content .md-ol {
+    @apply mb-4 pl-6 space-y-2;
+  }
+
+  .markdown-content .md-uli {
+    @apply list-disc text-foreground/90;
+  }
+
+  .markdown-content .md-oli {
+    @apply list-decimal text-foreground/90;
+  }
+
+  .markdown-content .md-quote {
+    @apply border-l-4 border-primary/50 pl-4 py-2 my-4 italic text-muted-foreground bg-primary/5 rounded-r-lg;
+  }
+
+  .markdown-content .md-link {
+    @apply text-primary hover:text-primary/80 underline underline-offset-2 transition-colors;
+  }
+
+  .markdown-content .md-hr {
+    @apply my-6 border-t border-border/50;
+  }
+
+  .markdown-content .code-block {
+    @apply my-4 rounded-xl overflow-hidden bg-[hsl(var(--surface-1))] border border-border/50;
+  }
+
+  .markdown-content .code-block .code-lang {
+    @apply block px-4 py-2 text-xs font-medium text-muted-foreground bg-[hsl(var(--surface-2))] border-b border-border/50;
+  }
+
+  .markdown-content .code-block pre {
+    @apply p-4 overflow-x-auto;
+  }
+
+  .markdown-content .code-block code {
+    @apply font-mono text-sm text-primary/90;
+  }
+
+  .markdown-content .inline-code {
+    @apply px-1.5 py-0.5 rounded bg-primary/10 text-primary font-mono text-sm;
+  }
+
+  /* AI Note container styling */
+  .ai-note-container {
+    @apply border border-primary/20;
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.03), hsl(var(--accent) / 0.03));
+  }
+
+  .note-content {
+    @apply max-w-none;
+  }
+}
+
+@layer utilities {
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-float-delayed {
+    animation: float 6s ease-in-out infinite 2s;
+  }
+
+  .animate-pulse-glow {
+    animation: pulseGlow 4s ease-in-out infinite;
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+}

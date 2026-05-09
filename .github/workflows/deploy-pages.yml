@@ -1,0 +1,76 @@
+name: Deploy to GitHub Pages
+
+# صراحة صلاحيات كتابة المحتويات ضرورية لكي يقدر action يدفع gh-pages
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: {}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies (npm install fallback)
+        run: |
+          set -e
+          npm install --prefer-offline --no-audit --no-progress || npm install --prefer-offline --no-audit --no-progress
+        shell: bash
+
+      - name: Build
+        run: npm run build
+
+      - name: Detect publish directory
+        run: |
+          if [ -d "./dist" ]; then
+            PUBLISH_DIR="./dist"
+          elif [ -d "./build" ]; then
+            PUBLISH_DIR="./build"
+          elif [ -d "./out" ]; then
+            PUBLISH_DIR="./out"
+          else
+            PUBLISH_DIR="./dist"
+          fi
+          echo "PUBLISH_DIR=$PUBLISH_DIR" >> $GITHUB_ENV
+          echo "Publish directory is $PUBLISH_DIR"
+        shell: bash
+
+      - name: Show files in publish directory (debug)
+        run: |
+          echo "Listing $PUBLISH_DIR"
+          ls -la "$PUBLISH_DIR" || true
+        shell: bash
+
+      # <-- إعداد git user قبل أي عمليات commit / push
+      - name: Configure git user
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ env.PUBLISH_DIR }}
+          publish_branch: gh-pages
