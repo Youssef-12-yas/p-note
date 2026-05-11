@@ -131,21 +131,69 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          last_analysis_at: string | null
+          level: string
           updated_at: string
+          xp: number
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
           full_name?: string | null
           id: string
+          last_analysis_at?: string | null
+          level?: string
           updated_at?: string
+          xp?: number
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
+          last_analysis_at?: string | null
+          level?: string
           updated_at?: string
+          xp?: number
+        }
+        Relationships: []
+      }
+      progress_snapshots: {
+        Row: {
+          created_at: string
+          id: string
+          level: string
+          metrics: Json | null
+          recommendations: string[] | null
+          strengths: string[] | null
+          summary: string | null
+          user_id: string
+          weaknesses: string[] | null
+          xp: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          level: string
+          metrics?: Json | null
+          recommendations?: string[] | null
+          strengths?: string[] | null
+          summary?: string | null
+          user_id: string
+          weaknesses?: string[] | null
+          xp?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          level?: string
+          metrics?: Json | null
+          recommendations?: string[] | null
+          strengths?: string[] | null
+          summary?: string | null
+          user_id?: string
+          weaknesses?: string[] | null
+          xp?: number
         }
         Relationships: []
       }
@@ -154,6 +202,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_groups_with_stats: {
+        Args: never
+        Returns: {
+          created_at: string
+          description: string
+          icon: string
+          id: string
+          lessons_count: number
+          name: string
+          notes_count: number
+          updated_at: string
+          user_id: string
+        }[]
+      }
+      get_user_dashboard_stats: { Args: never; Returns: Json }
       user_owns_group: { Args: { group_id: string }; Returns: boolean }
       user_owns_lesson: { Args: { lesson_id: string }; Returns: boolean }
       user_owns_note: { Args: { note_id: string }; Returns: boolean }
