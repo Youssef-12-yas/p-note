@@ -6,6 +6,9 @@ interface Profile {
   id: string;
   full_name: string | null;
   avatar_url: string | null;
+  level?: string | null;
+  xp?: number | null;
+  last_analysis_at?: string | null;
 }
 
 interface AuthContextType {
