@@ -10,7 +10,8 @@ import {
   Sparkles,
   ChevronDown,
   Menu,
-  X
+  X,
+  User
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -25,6 +26,7 @@ const navItems = [
   { icon: Home, label: 'Dashboard', path: '/dashboard' },
   { icon: FolderOpen, label: 'Groups', path: '/groups' },
   { icon: Sparkles, label: 'AI Review', path: '/ai-review' },
+  { icon: User, label: 'Profile', path: '/profile' },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 
@@ -60,9 +62,13 @@ export function Sidebar({ onLogout }: SidebarProps) {
             </div>
             <span className="text-base font-bold gradient-text">P-Note</span>
           </Link>
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/50 to-accent/50 flex items-center justify-center">
-            <span className="text-xs font-semibold">{initials}</span>
-          </div>
+          <Link to="/profile" className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/50 to-accent/50 flex items-center justify-center overflow-hidden ring-1 ring-border/40">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="me" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-xs font-semibold">{initials}</span>
+            )}
+          </Link>
         </header>
 
         {/* Mobile bottom tab bar */}
@@ -274,14 +280,18 @@ export function Sidebar({ onLogout }: SidebarProps) {
       {/* User section */}
       <div className="p-4 border-t border-border/50">
         <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/50 to-accent/50 flex items-center justify-center shrink-0">
-            <span className="text-sm font-semibold">{initials}</span>
-          </div>
+          <Link to="/profile" className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/50 to-accent/50 flex items-center justify-center shrink-0 overflow-hidden ring-1 ring-border/40 hover:ring-primary/60 transition-all">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="me" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-sm font-semibold">{initials}</span>
+            )}
+          </Link>
           {!isCollapsed && (
-            <div className="flex-1 min-w-0">
+            <Link to="/profile" className="flex-1 min-w-0 hover:text-primary transition-colors">
               <p className="font-medium truncate">{displayName}</p>
               <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-            </div>
+            </Link>
           )}
           {!isCollapsed && (
             <button 

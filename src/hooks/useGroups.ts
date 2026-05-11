@@ -22,48 +22,22 @@ export function useGroups() {
     queryKey: ['groups', user?.id],
     queryFn: async () => {
       if (!user) return [];
-
-      const { data: groups, error } = await supabase
-        .from('groups')
-        .select('*')
-        .order('updated_at', { ascending: false });
-
+      const { data, error } = await supabase.rpc('get_groups_with_stats');
       if (error) throw error;
-
-      // Get counts for each group
-      const groupsWithCounts = await Promise.all(
-        (groups || []).map(async (group) => {
-          const { count: lessonsCount } = await supabase
-            .from('lessons')
-            .select('*', { count: 'exact', head: true })
-            .eq('group_id', group.id);
-
-          const { data: lessons } = await supabase
-            .from('lessons')
-            .select('id')
-            .eq('group_id', group.id);
-
-          let notesCount = 0;
-          if (lessons && lessons.length > 0) {
-            const lessonIds = lessons.map((l) => l.id);
-            const { count } = await supabase
-              .from('notes')
-              .select('*', { count: 'exact', head: true })
-              .in('lesson_id', lessonIds);
-            notesCount = count || 0;
-          }
-
-          return {
-            ...group,
-            lessonsCount: lessonsCount || 0,
-            notesCount,
-          };
-        })
-      );
-
-      return groupsWithCounts;
+      return (data || []).map((g: any) => ({
+        id: g.id,
+        name: g.name,
+        description: g.description,
+        icon: g.icon,
+        user_id: g.user_id,
+        created_at: g.created_at,
+        updated_at: g.updated_at,
+        lessonsCount: Number(g.lessons_count) || 0,
+        notesCount: Number(g.notes_count) || 0,
+      })) as Group[];
     },
     enabled: !!user,
+    staleTime: 30 * 1000,
   });
 }
 
