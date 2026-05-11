@@ -62,9 +62,13 @@ export function Sidebar({ onLogout }: SidebarProps) {
             </div>
             <span className="text-base font-bold gradient-text">P-Note</span>
           </Link>
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/50 to-accent/50 flex items-center justify-center">
-            <span className="text-xs font-semibold">{initials}</span>
-          </div>
+          <Link to="/profile" className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/50 to-accent/50 flex items-center justify-center overflow-hidden ring-1 ring-border/40">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="me" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-xs font-semibold">{initials}</span>
+            )}
+          </Link>
         </header>
 
         {/* Mobile bottom tab bar */}
