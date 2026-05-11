@@ -10,7 +10,8 @@ import {
   Sparkles,
   ChevronDown,
   Menu,
-  X
+  X,
+  User
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -25,6 +26,7 @@ const navItems = [
   { icon: Home, label: 'Dashboard', path: '/dashboard' },
   { icon: FolderOpen, label: 'Groups', path: '/groups' },
   { icon: Sparkles, label: 'AI Review', path: '/ai-review' },
+  { icon: User, label: 'Profile', path: '/profile' },
   { icon: Settings, label: 'Settings', path: '/settings' },
 ];
 
