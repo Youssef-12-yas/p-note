@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,48 +9,44 @@ import { AuthPage } from './components/Auth/AuthPage';
 import { MainLayout } from './components/Layout/MainLayout';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { GroupsPage } from './components/Groups/GroupsPage';
-import { GroupDetail } from './components/Groups/GroupDetail';
-import { NoteEditor } from './components/Notes/NoteEditor';
-import { AIReviewPage } from './components/AIReview/AIReviewPage';
-import { SettingsPage } from './components/Settings/SettingsPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+// Lazy-load heavier routes
+const GroupDetail = lazy(() => import('./components/Groups/GroupDetail').then(m => ({ default: m.GroupDetail })));
+const NoteEditor = lazy(() => import('./components/Notes/NoteEditor').then(m => ({ default: m.NoteEditor })));
+const AIReviewPage = lazy(() => import('./components/AIReview/AIReviewPage').then(m => ({ default: m.AIReviewPage })));
+const SettingsPage = lazy(() => import('./components/Settings/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const ProfilePage = lazy(() => import('./pages/Profile'));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000,
+      gcTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+const Spinner = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+  </div>
+);
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
+  if (isLoading) return <Spinner />;
+  if (!user) return <Navigate to="/auth" replace />;
   return <>{children}</>;
 }
 
 function AuthRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (user) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
+  if (isLoading) return <Spinner />;
+  if (user) return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
 }
 
@@ -69,96 +65,48 @@ function AppRoutes() {
     await signOut();
   };
 
-  // Show onboarding first
   if (!hasSeenOnboarding) {
     return <OnboardingScreen onComplete={handleOnboardingComplete} />;
   }
 
+  const wrap = (el: React.ReactNode) => (
+    <ProtectedRoute>
+      <MainLayout onLogout={handleLogout}>
+        <Suspense fallback={<Spinner />}>{el}</Suspense>
+      </MainLayout>
+    </ProtectedRoute>
+  );
+
   return (
     <Routes>
-      {/* Auth routes */}
-      <Route 
-        path="/auth" 
-        element={
-          <AuthRoute>
-            <AuthPage />
-          </AuthRoute>
-        } 
-      />
-      
-      {/* Protected routes */}
-      <Route 
-        path="/dashboard" 
-        element={
-          <ProtectedRoute>
-            <MainLayout onLogout={handleLogout}><Dashboard /></MainLayout>
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/groups" 
-        element={
-          <ProtectedRoute>
-            <MainLayout onLogout={handleLogout}><GroupsPage /></MainLayout>
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/groups/:groupId" 
-        element={
-          <ProtectedRoute>
-            <MainLayout onLogout={handleLogout}><GroupDetail /></MainLayout>
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/notes/:noteId" 
-        element={
-          <ProtectedRoute>
-            <MainLayout onLogout={handleLogout}><NoteEditor /></MainLayout>
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/ai-review" 
-        element={
-          <ProtectedRoute>
-            <MainLayout onLogout={handleLogout}><AIReviewPage /></MainLayout>
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/settings" 
-        element={
-          <ProtectedRoute>
-            <MainLayout onLogout={handleLogout}><SettingsPage /></MainLayout>
-          </ProtectedRoute>
-        } 
-      />
-      
-      {/* Index redirects */}
+      <Route path="/auth" element={<AuthRoute><AuthPage /></AuthRoute>} />
+
+      <Route path="/dashboard" element={wrap(<Dashboard />)} />
+      <Route path="/groups" element={wrap(<GroupsPage />)} />
+      <Route path="/groups/:groupId" element={wrap(<GroupDetail />)} />
+      <Route path="/notes/:noteId" element={wrap(<NoteEditor />)} />
+      <Route path="/ai-review" element={wrap(<AIReviewPage />)} />
+      <Route path="/profile" element={wrap(<ProfilePage />)} />
+      <Route path="/settings" element={wrap(<SettingsPage />)} />
+
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      
-      {/* 404 */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
 
-const App = () => {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </QueryClientProvider>
-  );
-};
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
+  </QueryClientProvider>
+);
 
 export default App;
