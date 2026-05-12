@@ -1,26 +1,16 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowLeft, 
-  Plus, 
-  Search, 
-  BookOpen, 
-  FileText, 
-  Sparkles,
-  Clock,
-  ChevronRight,
-  ChevronDown,
-  X,
-  Trash2,
-  Loader2,
-  GraduationCap,
-  Lightbulb
+import {
+  ArrowLeft, Plus, Search, BookOpen, FileText, Sparkles, Clock,
+  ChevronRight, X, Trash2, Loader2, GraduationCap, Lightbulb
 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useGroup } from '@/hooks/useGroups';
 import { useLessons, useCreateLesson, useDeleteLesson } from '@/hooks/useLessons';
 import { useCreateNote, useGenerateAINote } from '@/hooks/useNotes';
 import { formatDistanceToNow } from 'date-fns';
+import { ar as arLocale } from 'date-fns/locale';
+import { useT } from '@/lib/i18n';
 
 const gradientColors = [
   'from-[hsl(var(--gradient-start))] to-[hsl(var(--gradient-end))]',
@@ -32,6 +22,9 @@ const gradientColors = [
 export function GroupDetail() {
   const { groupId } = useParams();
   const navigate = useNavigate();
+  const { t, lang } = useT();
+  const dateLocale = lang === 'ar' ? arLocale : undefined;
+
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedLesson, setExpandedLesson] = useState<string | null>(null);
   const [showNewLesson, setShowNewLesson] = useState(false);
@@ -52,18 +45,14 @@ export function GroupDetail() {
   const handleCreateLesson = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!groupId) return;
-    
-    await createLesson.mutateAsync({
-      groupId,
-      name: newLessonName,
-    });
+    await createLesson.mutateAsync({ groupId, name: newLessonName });
     setShowNewLesson(false);
     setNewLessonName('');
   };
 
   const handleDeleteLesson = async (lessonId: string) => {
     if (!groupId) return;
-    if (confirm('Are you sure you want to delete this lesson? All notes will be deleted.')) {
+    if (confirm(t('lesson.confirmDelete'))) {
       await deleteLesson.mutateAsync({ lessonId, groupId });
     }
   };
@@ -83,16 +72,13 @@ export function GroupDetail() {
       .map(n => ({ title: n.title, content: n.content || '' }));
 
     if (userNotes.length === 0) {
-      alert('Please add some notes first before generating AI content.');
+      alert(t('lesson.addNotesFirst'));
       return;
     }
 
     setGeneratingAI(lessonId);
     try {
-      await generateAINote.mutateAsync({
-        lessonId,
-        userNotes,
-      });
+      await generateAINote.mutateAsync({ lessonId, userNotes });
     } finally {
       setGeneratingAI(null);
     }
@@ -109,9 +95,9 @@ export function GroupDetail() {
   if (!group) {
     return (
       <div className="text-center py-16">
-        <h2 className="text-xl font-semibold mb-2">Group not found</h2>
+        <h2 className="text-xl font-semibold mb-2">{t('lesson.notFound')}</h2>
         <Link to="/groups" className="text-primary hover:underline">
-          Back to Groups
+          {t('lesson.backToGroups')}
         </Link>
       </div>
     );
@@ -123,77 +109,70 @@ export function GroupDetail() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+        className="mb-6 md:mb-8"
       >
-        {/* Back button */}
-        <Link to="/groups" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4 transition-colors">
-          <ArrowLeft className="w-4 h-4" />
-          Back to Groups
+        <Link to="/groups" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4 transition-colors text-sm">
+          <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+          {t('lesson.backToGroups')}
         </Link>
 
-        {/* Group info */}
-        <div className="flex items-start gap-4">
-          <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${gradientColors[0]} flex items-center justify-center text-3xl shadow-lg`}>
+        <div className="flex items-start gap-3 md:gap-4">
+          <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br ${gradientColors[0]} flex items-center justify-center text-2xl md:text-3xl shadow-lg shrink-0`}>
             {group.icon || '📚'}
           </div>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold mb-1">{group.name}</h1>
-            <p className="text-muted-foreground">{group.description || 'No description'}</p>
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl md:text-3xl font-bold mb-1 truncate">{group.name}</h1>
+            <p className="text-sm md:text-base text-muted-foreground line-clamp-2">{group.description || t('groups.noDescription')}</p>
           </div>
         </div>
       </motion.div>
 
-      {/* Actions bar */}
+      {/* Actions bar — stacks on mobile */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="flex items-center justify-between gap-4 mb-6"
+        className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:items-center sm:justify-between mb-6"
       >
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <div className="relative w-full sm:max-w-md">
+          <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
           <input
             type="text"
-            placeholder="Search lessons..."
+            placeholder={t('lesson.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="input-glass pl-10 pr-4 py-2 w-full"
+            className="input-glass ps-10 pe-4 py-2.5 w-full"
           />
         </div>
 
         <motion.button
-          whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setShowNewLesson(true)}
-          className="btn-secondary flex items-center gap-2"
+          className="btn-secondary flex items-center justify-center gap-2 w-full sm:w-auto py-2.5 whitespace-nowrap"
         >
           <Plus className="w-4 h-4" />
-          New Lesson
+          {t('lesson.newLesson')}
         </motion.button>
       </motion.div>
 
       {/* Lessons List */}
       {filteredLessons.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-16"
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-secondary flex items-center justify-center">
             <BookOpen className="w-8 h-8 text-muted-foreground" />
           </div>
-          <h3 className="text-xl font-semibold mb-2">No lessons yet</h3>
-          <p className="text-muted-foreground mb-4">Create your first lesson to start learning</p>
+          <h3 className="text-xl font-semibold mb-2">{t('lesson.none')}</h3>
+          <p className="text-muted-foreground mb-4">{t('lesson.createFirst')}</p>
           <button
             onClick={() => setShowNewLesson(true)}
             className="btn-primary inline-flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            Create Lesson
+            {t('lesson.createLesson')}
           </button>
         </motion.div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
           <AnimatePresence>
             {filteredLessons.map((lesson, index) => {
               const userNotes = lesson.notes?.filter(n => !n.is_ai_generated) || [];
@@ -206,75 +185,77 @@ export function GroupDetail() {
                   key={lesson.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
+                  transition={{ delay: index * 0.04 }}
                   className="glass rounded-2xl overflow-hidden"
                 >
-                  {/* Lesson Header */}
-                  <motion.div
+                  {/* Lesson Header — compact on mobile */}
+                  <div
                     onClick={() => setExpandedLesson(isExpanded ? null : lesson.id)}
-                    className="p-5 cursor-pointer hover:bg-secondary/30 transition-colors flex items-center gap-4"
+                    className="p-3 md:p-5 cursor-pointer hover:bg-secondary/30 transition-colors flex items-center gap-3"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center shrink-0">
-                      <GraduationCap className="w-6 h-6 text-primary" />
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center shrink-0">
+                      <GraduationCap className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-lg truncate">{lesson.name}</h3>
+                      <div className="flex items-center gap-2 mb-0.5 md:mb-1">
+                        <h3 className="font-semibold text-base md:text-lg truncate">{lesson.name}</h3>
                         {aiNotes.length > 0 && (
-                          <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs flex items-center gap-1 shrink-0">
+                          <span className="px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] md:text-xs flex items-center gap-1 shrink-0">
                             <Sparkles className="w-3 h-3" />
-                            {aiNotes.length} AI
+                            {aiNotes.length}
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-3 text-xs md:text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
-                          <FileText className="w-3.5 h-3.5" />
-                          {userNotes.length} notes
+                          <FileText className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                          {userNotes.length} {t('lesson.notesCount')}
                         </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5" />
-                          {formatDistanceToNow(new Date(lesson.updated_at), { addSuffix: true })}
+                        <span className="hidden xs:flex items-center gap-1 truncate">
+                          <Clock className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                          {formatDistanceToNow(new Date(lesson.updated_at), { addSuffix: true, locale: dateLocale })}
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                    {/* Actions — tighter spacing & smaller buttons on mobile */}
+                    <div className="flex items-center gap-1 md:gap-2 shrink-0">
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleGenerateAI(lesson.id, lesson.notes || []);
                         }}
                         disabled={isGenerating}
-                        className="p-2.5 rounded-xl bg-primary/10 hover:bg-primary/20 text-primary transition-colors disabled:opacity-50"
-                        title="Generate AI Summary"
+                        className="p-2 md:p-2.5 rounded-lg md:rounded-xl bg-primary/10 hover:bg-primary/20 text-primary transition-colors disabled:opacity-50"
+                        title={t('lesson.aiTooltip')}
+                        aria-label={t('lesson.aiTooltip')}
                       >
                         {isGenerating ? (
-                          <Loader2 className="w-5 h-5 animate-spin" />
+                          <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
                         ) : (
-                          <Sparkles className="w-5 h-5" />
+                          <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
                         )}
-                      </motion.button>
+                      </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDeleteLesson(lesson.id);
                         }}
                         className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                        aria-label={t('common.delete')}
                       >
-                        <Trash2 className="w-5 h-5" />
+                        <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
                       </button>
                       <motion.div
                         animate={{ rotate: isExpanded ? 90 : 0 }}
                         transition={{ duration: 0.2 }}
+                        className="hidden sm:block"
                       >
-                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                        <ChevronRight className="w-5 h-5 text-muted-foreground rtl:rotate-180" />
                       </motion.div>
                     </div>
-                  </motion.div>
+                  </div>
 
                   {/* Expanded Content */}
                   <AnimatePresence>
@@ -286,36 +267,32 @@ export function GroupDetail() {
                         transition={{ duration: 0.2 }}
                         className="border-t border-border/50"
                       >
-                        <div className="p-5 space-y-6">
-                          {/* AI Generated Notes Section */}
+                        <div className="p-4 md:p-5 space-y-5">
                           {aiNotes.length > 0 && (
                             <div>
                               <div className="flex items-center gap-2 mb-3">
                                 <Lightbulb className="w-4 h-4 text-primary" />
-                                <h4 className="text-sm font-semibold text-primary">AI Learning Content</h4>
+                                <h4 className="text-sm font-semibold text-primary">{t('lesson.aiContent')}</h4>
                               </div>
                               <div className="space-y-2">
                                 {aiNotes.map((note) => (
                                   <Link key={note.id} to={`/notes/${note.id}`}>
                                     <motion.div
-                                      whileHover={{ scale: 1.01, x: 4 }}
-                                      className="p-4 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-accent/5 
-                                                 border border-primary/20 hover:border-primary/40 transition-all 
-                                                 cursor-pointer group"
+                                      whileHover={{ x: 4 }}
+                                      className="p-3 md:p-4 rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-accent/5 border border-primary/20 hover:border-primary/40 transition-all cursor-pointer group"
                                     >
                                       <div className="flex items-start gap-3">
-                                        <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
-                                          <Sparkles className="w-5 h-5 text-primary" />
+                                        <div className="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
+                                          <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                          <p className="font-medium text-foreground group-hover:text-primary transition-colors truncate">
+                                          <p className="font-medium text-sm md:text-base text-foreground group-hover:text-primary transition-colors truncate">
                                             {note.title}
                                           </p>
-                                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                                            {note.content?.slice(0, 150) || 'AI generated learning content'}
+                                          <p className="text-xs md:text-sm text-muted-foreground mt-1 line-clamp-2">
+                                            {note.content?.slice(0, 150) || ''}
                                           </p>
                                         </div>
-                                        <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0 mt-2" />
                                       </div>
                                     </motion.div>
                                   </Link>
@@ -324,13 +301,12 @@ export function GroupDetail() {
                             </div>
                           )}
 
-                          {/* User Notes Section */}
                           <div>
                             <div className="flex items-center gap-2 mb-3">
                               <FileText className="w-4 h-4 text-muted-foreground" />
-                              <h4 className="text-sm font-semibold text-muted-foreground">Your Notes</h4>
+                              <h4 className="text-sm font-semibold text-muted-foreground">{t('lesson.yourNotes')}</h4>
                             </div>
-                            
+
                             {userNotes.length > 0 ? (
                               <div className="grid gap-2">
                                 {userNotes.map((note) => (
@@ -345,32 +321,27 @@ export function GroupDetail() {
                                           {note.title}
                                         </p>
                                         <p className="text-xs text-muted-foreground truncate">
-                                          {note.content?.slice(0, 80) || 'Empty note'}
+                                          {note.content?.slice(0, 80) || ''}
                                         </p>
                                       </div>
-                                      <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                                     </motion.div>
                                   </Link>
                                 ))}
                               </div>
                             ) : (
                               <p className="text-sm text-muted-foreground text-center py-4">
-                                No notes yet. Add your first note!
+                                {t('lesson.noNotesYet')}
                               </p>
                             )}
 
-                            {/* Add new note */}
                             <motion.button
-                              whileHover={{ scale: 1.01 }}
                               whileTap={{ scale: 0.99 }}
                               onClick={() => handleAddNote(lesson.id)}
                               disabled={createNote.isPending}
-                              className="w-full mt-3 p-3 rounded-xl border border-dashed border-border/50 hover:border-primary/50 
-                                         hover:bg-primary/5 transition-all flex items-center justify-center gap-2 text-muted-foreground 
-                                         hover:text-primary text-sm disabled:opacity-50"
+                              className="w-full mt-3 p-3 rounded-xl border border-dashed border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all flex items-center justify-center gap-2 text-muted-foreground hover:text-primary text-sm disabled:opacity-50"
                             >
                               <Plus className="w-4 h-4" />
-                              Add Note
+                              {t('lesson.addNote')}
                             </motion.button>
                           </div>
                         </div>
@@ -399,13 +370,14 @@ export function GroupDetail() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass rounded-2xl p-6 w-full max-w-md"
+              className="glass rounded-2xl p-5 md:p-6 w-full max-w-md"
             >
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold">Create New Lesson</h2>
+                <h2 className="text-xl font-semibold">{t('lesson.createNew')}</h2>
                 <button
                   onClick={() => setShowNewLesson(false)}
                   className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                  aria-label="close"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -413,12 +385,12 @@ export function GroupDetail() {
 
               <form onSubmit={handleCreateLesson} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Lesson Title</label>
+                  <label className="block text-sm font-medium mb-2">{t('lesson.name')}</label>
                   <input
                     type="text"
                     value={newLessonName}
                     onChange={(e) => setNewLessonName(e.target.value)}
-                    placeholder="e.g., Exception Handling"
+                    placeholder={t('lesson.namePlaceholder')}
                     className="input-glass w-full"
                     required
                   />
@@ -430,14 +402,14 @@ export function GroupDetail() {
                     onClick={() => setShowNewLesson(false)}
                     className="btn-secondary flex-1"
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="btn-primary flex-1"
                     disabled={createLesson.isPending}
                   >
-                    {createLesson.isPending ? 'Creating...' : 'Create Lesson'}
+                    {createLesson.isPending ? t('common.creating') : t('lesson.createLesson')}
                   </button>
                 </div>
               </form>
@@ -453,7 +425,7 @@ export function GroupDetail() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center"
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -464,8 +436,8 @@ export function GroupDetail() {
               <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center glow">
                 <Sparkles className="w-10 h-10 text-primary-foreground animate-pulse" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">AI is analyzing your notes...</h3>
-              <p className="text-muted-foreground">Creating a comprehensive summary with insights</p>
+              <h3 className="text-xl font-semibold mb-2">{lang === 'ar' ? 'جاري تحليل ملاحظاتك...' : 'AI is analyzing your notes...'}</h3>
+              <p className="text-muted-foreground">{lang === 'ar' ? 'إنشاء ملخص شامل مع رؤى' : 'Creating a comprehensive summary with insights'}</p>
             </motion.div>
           </motion.div>
         )}

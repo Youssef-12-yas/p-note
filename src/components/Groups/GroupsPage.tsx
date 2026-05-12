@@ -1,18 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  FolderOpen, 
-  Plus, 
-  Search, 
-  MoreVertical, 
-  Edit2, 
-  Trash2,
-  BookOpen,
-  FileText,
-  X
+import {
+  FolderOpen, Plus, Search, MoreVertical, Trash2, BookOpen, FileText, X
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useGroups, useCreateGroup, useDeleteGroup } from '@/hooks/useGroups';
+import { useT } from '@/lib/i18n';
 
 const gradientColors = [
   'from-blue-500 to-cyan-500',
@@ -26,6 +19,8 @@ const gradientColors = [
 const defaultIcons = ['📚', '💻', '🧠', '🌳', '🤖', '🌐', '⚛️', '🎨', '📊', '🔬'];
 
 export function GroupsPage() {
+  const { t } = useT();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [showNewGroup, setShowNewGroup] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
@@ -37,7 +32,16 @@ export function GroupsPage() {
   const createGroup = useCreateGroup();
   const deleteGroup = useDeleteGroup();
 
-  const filteredGroups = groups.filter(group => 
+  // Auto-open the create modal when arriving with ?new=1 (from Sidebar)
+  useEffect(() => {
+    if (searchParams.get('new') === '1') {
+      setShowNewGroup(true);
+      searchParams.delete('new');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
+  const filteredGroups = groups.filter(group =>
     group.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -55,7 +59,7 @@ export function GroupsPage() {
   };
 
   const handleDeleteGroup = async (groupId: string) => {
-    if (confirm('Are you sure you want to delete this group? All lessons and notes will be deleted.')) {
+    if (confirm(t('groups.confirmDelete'))) {
       await deleteGroup.mutateAsync(groupId);
     }
     setMenuOpen(null);
@@ -63,64 +67,56 @@ export function GroupsPage() {
 
   return (
     <div>
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <h1 className="text-3xl font-bold mb-1">Groups</h1>
-          <p className="text-muted-foreground">Organize your learning spaces</p>
+      {/* Header — stacked on mobile, row on md+ */}
+      <div className="flex flex-col gap-4 mb-6 md:mb-8 md:flex-row md:items-center md:justify-between">
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 className="text-2xl md:text-3xl font-bold mb-1">{t('groups.title')}</h1>
+          <p className="text-sm md:text-base text-muted-foreground">{t('groups.subtitle')}</p>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex items-center gap-3"
+          className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full md:w-auto"
         >
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          {/* Search — full width on mobile */}
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
             <input
               type="text"
-              placeholder="Search groups..."
+              placeholder={t('groups.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="input-glass pl-10 pr-4 py-2 w-full sm:w-64"
+              className="input-glass ps-10 pe-4 py-2.5 w-full"
             />
           </div>
 
-          {/* New Group Button */}
+          {/* New Group Button — full width on mobile */}
           <motion.button
-            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setShowNewGroup(true)}
-            className="btn-primary flex items-center gap-2"
+            className="btn-primary flex items-center justify-center gap-2 w-full sm:w-auto py-2.5"
           >
             <Plus className="w-4 h-4" />
-            New Group
+            <span className="whitespace-nowrap">{t('groups.newGroup')}</span>
           </motion.button>
         </motion.div>
       </div>
 
       {/* Groups Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="glass rounded-2xl p-6 animate-pulse">
               <div className="w-14 h-14 rounded-xl bg-secondary mb-4" />
               <div className="h-6 bg-secondary rounded w-3/4 mb-2" />
               <div className="h-4 bg-secondary rounded w-full mb-4" />
-              <div className="flex gap-4">
-                <div className="h-4 bg-secondary rounded w-20" />
-                <div className="h-4 bg-secondary rounded w-20" />
-              </div>
             </div>
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           <AnimatePresence>
             {filteredGroups.map((group, index) => (
               <motion.div
@@ -128,63 +124,61 @@ export function GroupsPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ delay: index * 0.05 }}
+                transition={{ delay: index * 0.04 }}
               >
                 <Link to={`/groups/${group.id}`}>
                   <motion.div
                     whileHover={{ scale: 1.02, y: -4 }}
-                    className="glass-hover rounded-2xl p-6 h-full cursor-pointer group relative"
+                    className="glass-hover rounded-2xl p-5 md:p-6 h-full cursor-pointer group relative"
                   >
-                    {/* Icon & Menu */}
                     <div className="flex items-start justify-between mb-4">
-                      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${gradientColors[index % gradientColors.length]} flex items-center justify-center text-2xl`}>
+                      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${gradientColors[index % gradientColors.length]} flex items-center justify-center text-2xl shrink-0`}>
                         {group.icon || '📚'}
                       </div>
                       <div className="relative">
-                        <button 
+                        <button
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
                             setMenuOpen(menuOpen === group.id ? null : group.id);
                           }}
-                          className="p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-secondary"
+                          className="p-2 rounded-lg sm:opacity-0 sm:group-hover:opacity-100 opacity-100 transition-opacity hover:bg-secondary"
+                          aria-label="actions"
                         >
                           <MoreVertical className="w-4 h-4 text-muted-foreground" />
                         </button>
-                        
+
                         {menuOpen === group.id && (
-                          <div className="absolute right-0 top-full mt-1 w-32 glass rounded-lg py-1 z-10">
+                          <div className="absolute end-0 top-full mt-1 w-32 glass rounded-lg py-1 z-10">
                             <button
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 handleDeleteGroup(group.id);
                               }}
-                              className="w-full px-3 py-2 text-left text-sm text-destructive hover:bg-destructive/10 flex items-center gap-2"
+                              className="w-full px-3 py-2 text-start text-sm text-destructive hover:bg-destructive/10 flex items-center gap-2"
                             >
                               <Trash2 className="w-4 h-4" />
-                              Delete
+                              {t('common.delete')}
                             </button>
                           </div>
                         )}
                       </div>
                     </div>
 
-                    {/* Content */}
-                    <h3 className="text-xl font-semibold mb-2">{group.name}</h3>
-                    <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                      {group.description || 'No description'}
+                    <h3 className="text-lg md:text-xl font-semibold mb-2 truncate">{group.name}</h3>
+                    <p className="text-muted-foreground text-sm mb-4 line-clamp-2 min-h-[2.5rem]">
+                      {group.description || t('groups.noDescription')}
                     </p>
 
-                    {/* Stats */}
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1.5">
                         <BookOpen className="w-4 h-4" />
-                        <span>{group.lessonsCount || 0} lessons</span>
+                        <span>{group.lessonsCount || 0} {t('dash.lessons')}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <FileText className="w-4 h-4" />
-                        <span>{group.notesCount || 0} notes</span>
+                        <span>{group.notesCount || 0} {t('dash.notes')}</span>
                       </div>
                     </div>
                   </motion.div>
@@ -197,17 +191,13 @@ export function GroupsPage() {
 
       {/* Empty State */}
       {!isLoading && filteredGroups.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-center py-16"
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-secondary flex items-center justify-center">
             <FolderOpen className="w-8 h-8 text-muted-foreground" />
           </div>
-          <h3 className="text-xl font-semibold mb-2">No groups found</h3>
+          <h3 className="text-xl font-semibold mb-2">{t('groups.notFound')}</h3>
           <p className="text-muted-foreground mb-4">
-            {searchQuery ? 'Try a different search term' : 'Create your first group to get started'}
+            {searchQuery ? t('groups.tryDifferent') : t('groups.startHint')}
           </p>
           {!searchQuery && (
             <button
@@ -215,7 +205,7 @@ export function GroupsPage() {
               className="btn-primary inline-flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
-              Create Group
+              {t('groups.createGroup')}
             </button>
           )}
         </motion.div>
@@ -236,22 +226,22 @@ export function GroupsPage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass rounded-2xl p-6 w-full max-w-md"
+              className="glass rounded-2xl p-5 md:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold">Create New Group</h2>
+                <h2 className="text-xl font-semibold">{t('groups.createNewGroup')}</h2>
                 <button
                   onClick={() => setShowNewGroup(false)}
                   className="p-2 rounded-lg hover:bg-secondary transition-colors"
+                  aria-label="close"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <form onSubmit={handleCreateGroup} className="space-y-4">
-                {/* Icon selector */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Icon</label>
+                  <label className="block text-sm font-medium mb-2">{t('groups.icon')}</label>
                   <div className="flex flex-wrap gap-2">
                     {defaultIcons.map((icon) => (
                       <button
@@ -271,23 +261,23 @@ export function GroupsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Group Name</label>
+                  <label className="block text-sm font-medium mb-2">{t('groups.name')}</label>
                   <input
                     type="text"
                     value={newGroupName}
                     onChange={(e) => setNewGroupName(e.target.value)}
-                    placeholder="e.g., JavaScript Mastery"
+                    placeholder={t('groups.namePlaceholder')}
                     className="input-glass w-full"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Description</label>
+                  <label className="block text-sm font-medium mb-2">{t('groups.description')}</label>
                   <textarea
                     value={newGroupDescription}
                     onChange={(e) => setNewGroupDescription(e.target.value)}
-                    placeholder="What will you learn in this group?"
+                    placeholder={t('groups.descriptionPlaceholder')}
                     rows={3}
                     className="input-glass w-full resize-none"
                   />
@@ -299,14 +289,14 @@ export function GroupsPage() {
                     onClick={() => setShowNewGroup(false)}
                     className="btn-secondary flex-1"
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="btn-primary flex-1"
                     disabled={createGroup.isPending}
                   >
-                    {createGroup.isPending ? 'Creating...' : 'Create Group'}
+                    {createGroup.isPending ? t('common.creating') : t('groups.createGroup')}
                   </button>
                 </div>
               </form>

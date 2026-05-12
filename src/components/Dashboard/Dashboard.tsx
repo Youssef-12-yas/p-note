@@ -1,13 +1,6 @@
 import { motion } from 'framer-motion';
-import { 
-  FolderOpen, 
-  FileText, 
-  Sparkles, 
-  Clock, 
-  TrendingUp,
-  Plus,
-  ArrowRight,
-  Brain
+import {
+  FolderOpen, FileText, Sparkles, Clock, Plus, ArrowRight, Brain
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,6 +8,8 @@ import { useGroups } from '@/hooks/useGroups';
 import { useRecentNotes } from '@/hooks/useNotes';
 import { useStats } from '@/hooks/useStats';
 import { formatDistanceToNow } from 'date-fns';
+import { ar as arLocale } from 'date-fns/locale';
+import { useT } from '@/lib/i18n';
 
 const gradientColors = [
   'from-blue-500 to-cyan-500',
@@ -27,23 +22,24 @@ const gradientColors = [
 
 export function Dashboard() {
   const { profile, user } = useAuth();
+  const { t, lang } = useT();
   const { data: groups = [], isLoading: groupsLoading } = useGroups();
   const { data: recentNotes = [], isLoading: notesLoading } = useRecentNotes(5);
   const { data: stats } = useStats();
 
-  const displayName = profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'there';
-  
+  const displayName = profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || '';
+
   const greeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
+    if (hour < 12) return t('dash.morning');
+    if (hour < 18) return t('dash.afternoon');
+    return t('dash.evening');
   };
 
   const statsData = [
-    { label: 'Total Groups', value: stats?.totalGroups || 0, icon: FolderOpen, trend: '+2 this week' },
-    { label: 'Total Notes', value: stats?.totalNotes || 0, icon: FileText, trend: '+12 this week' },
-    { label: 'AI Reviews', value: stats?.aiReviews || 0, icon: Sparkles, trend: '+5 this week' },
+    { label: t('dash.totalGroups'), value: stats?.totalGroups || 0, icon: FolderOpen },
+    { label: t('dash.totalNotes'), value: stats?.totalNotes || 0, icon: FileText },
+    { label: t('dash.aiReviews'), value: stats?.aiReviews || 0, icon: Sparkles },
   ];
 
   const recentGroups = groups.slice(0, 4);
@@ -57,13 +53,13 @@ export function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-3xl font-bold mb-2">{greeting()}, {displayName} 👋</h1>
-          <p className="text-muted-foreground">Ready to expand your knowledge today?</p>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">{greeting()}, {displayName} 👋</h1>
+          <p className="text-muted-foreground">{t('dash.subtitle')}</p>
         </motion.div>
       </header>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
         {statsData.map((stat, index) => (
           <motion.div
             key={stat.label}
@@ -76,10 +72,6 @@ export function Dashboard() {
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
                 <stat.icon className="w-6 h-6 text-primary" />
               </div>
-              <span className="text-xs text-success flex items-center gap-1">
-                <TrendingUp className="w-3 h-3" />
-                {stat.trend}
-              </span>
             </div>
             <p className="text-3xl font-bold mb-1">{stat.value}</p>
             <p className="text-muted-foreground text-sm">{stat.label}</p>
@@ -92,28 +84,26 @@ export function Dashboard() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="glass rounded-2xl p-6 mb-8"
+        className="glass rounded-2xl p-5 md:p-6 mb-8"
       >
-        <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+        <h2 className="text-lg font-semibold mb-4">{t('dash.quickActions')}</h2>
         <div className="flex flex-wrap gap-3">
-          <Link to="/groups">
+          <Link to="/groups?new=1">
             <motion.button
-              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="btn-primary flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
-              New Group
+              {t('nav.newGroup')}
             </motion.button>
           </Link>
           <Link to="/ai-review">
             <motion.button
-              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="btn-secondary flex items-center gap-2"
             >
               <Sparkles className="w-4 h-4" />
-              AI Review
+              {t('nav.aiReview')}
             </motion.button>
           </Link>
         </div>
@@ -127,9 +117,9 @@ export function Dashboard() {
           transition={{ delay: 0.4 }}
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Your Groups</h2>
+            <h2 className="text-lg font-semibold">{t('dash.yourGroups')}</h2>
             <Link to="/groups" className="text-sm text-primary hover:underline flex items-center gap-1">
-              View all <ArrowRight className="w-4 h-4" />
+              {t('dash.viewAll')} <ArrowRight className="w-4 h-4 rtl:rotate-180" />
             </Link>
           </div>
           
@@ -159,7 +149,7 @@ export function Dashboard() {
                     </div>
                     <h3 className="font-medium mb-1 truncate">{group.name}</h3>
                     <p className="text-xs text-muted-foreground">
-                      {group.lessonsCount} lessons • {group.notesCount} notes
+                      {group.lessonsCount} {t('dash.lessons')} • {group.notesCount} {t('dash.notes')}
                     </p>
                   </motion.div>
                 </Link>
@@ -168,9 +158,9 @@ export function Dashboard() {
           ) : (
             <div className="glass rounded-xl p-8 text-center">
               <FolderOpen className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-              <p className="text-muted-foreground mb-4">No groups yet</p>
-              <Link to="/groups">
-                <button className="btn-primary">Create your first group</button>
+              <p className="text-muted-foreground mb-4">{t('dash.noGroups')}</p>
+              <Link to="/groups?new=1">
+                <button className="btn-primary">{t('dash.createFirst')}</button>
               </Link>
             </div>
           )}
@@ -183,7 +173,7 @@ export function Dashboard() {
           transition={{ delay: 0.4 }}
         >
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Recent Notes</h2>
+            <h2 className="text-lg font-semibold">{t('dash.recentNotes')}</h2>
           </div>
           
           {notesLoading ? (
@@ -233,7 +223,7 @@ export function Dashboard() {
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
                       <Clock className="w-3 h-3" />
-                      {formatDistanceToNow(new Date(note.updated_at), { addSuffix: true })}
+                      {formatDistanceToNow(new Date(note.updated_at), { addSuffix: true, locale: lang === 'ar' ? arLocale : undefined })}
                     </div>
                   </motion.div>
                 </Link>
@@ -242,7 +232,7 @@ export function Dashboard() {
           ) : (
             <div className="glass rounded-xl p-8 text-center">
               <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
-              <p className="text-muted-foreground">No notes yet</p>
+              <p className="text-muted-foreground">{t('dash.noNotes')}</p>
             </div>
           )}
         </motion.div>
@@ -260,14 +250,18 @@ export function Dashboard() {
             <Brain className="w-6 h-6 text-primary-foreground" />
           </div>
           <div>
-            <h3 className="font-semibold mb-1">AI Insight</h3>
+            <h3 className="font-semibold mb-1">{t('dash.aiInsight')}</h3>
             <p className="text-muted-foreground text-sm mb-3">
-              {groups.length > 0 
-                ? `You have ${groups.length} learning groups. Keep adding notes and use AI Review to validate and expand your knowledge!`
-                : 'Start by creating your first group to organize your learning. AI will help you review and expand your knowledge.'}
+              {groups.length > 0
+                ? (lang === 'ar'
+                    ? `لديك ${groups.length} مجموعة تعلّم. تابع إضافة الملاحظات واستخدم مراجعة الذكاء لتوسيع معرفتك!`
+                    : `You have ${groups.length} learning groups. Keep adding notes and use AI Review to expand your knowledge!`)
+                : (lang === 'ar'
+                    ? 'ابدأ بإنشاء مجموعتك الأولى لتنظيم تعلّمك. سيساعدك الذكاء الاصطناعي على مراجعة معرفتك وتوسيعها.'
+                    : 'Start by creating your first group. AI will help you review and expand your knowledge.')}
             </p>
             <Link to="/ai-review" className="text-sm text-primary hover:underline flex items-center gap-1">
-              Get personalized recommendations <ArrowRight className="w-4 h-4" />
+              {lang === 'ar' ? 'احصل على توصيات شخصية' : 'Get personalized recommendations'} <ArrowRight className="w-4 h-4 rtl:rotate-180" />
             </Link>
           </div>
         </div>
