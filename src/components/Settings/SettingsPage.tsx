@@ -1,23 +1,16 @@
 import { motion } from 'framer-motion';
-import { 
-  User, 
-  Bell, 
-  Palette, 
-  Shield, 
-  Database, 
-  ChevronRight,
-  Trash2,
-  LogOut,
-  Mail,
-  Save,
-  Loader2
+import {
+  User, Bell, Palette, Shield, Database, ChevronRight,
+  Trash2, LogOut, Mail, Save, Loader2, Languages
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { useT } from '@/lib/i18n';
 
 export function SettingsPage() {
   const { user, profile, updateProfile, signOut } = useAuth();
+  const { t, lang, setLang } = useT();
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [isSaving, setIsSaving] = useState(false);
   

@@ -15,7 +15,7 @@ export function MainLayout({ children, onLogout }: MainLayoutProps) {
       <Sidebar onLogout={onLogout} />
       <main
         className={`transition-all duration-300 ${
-          isMobile ? 'pl-0 pt-14 pb-20' : 'pl-64'
+          isMobile ? 'ps-0 pt-14 pb-20' : 'ps-64'
         }`}
       >
         <div className={`mx-auto max-w-6xl ${isMobile ? 'p-4' : 'p-8'}`}>
