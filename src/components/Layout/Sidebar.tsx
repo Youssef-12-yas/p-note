@@ -59,7 +59,7 @@ export function Sidebar({ onLogout }: SidebarProps) {
           <button
             onClick={() => setMobileOpen(true)}
             className="p-2 -ml-2 rounded-lg hover:bg-secondary/60 transition-colors"
-            aria-label="Open menu"
+            aria-label={t('nav.openMenu')}
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -135,11 +135,11 @@ export function Sidebar({ onLogout }: SidebarProps) {
                 {/* New button */}
                 <div className="px-4 mb-4">
                   <button
-                    onClick={() => { navigate('/groups'); closeMobile(); }}
+                    onClick={goNewGroup}
                     className="btn-primary w-full flex items-center justify-center gap-2"
                   >
                     <Plus className="w-5 h-5" />
-                    <span>New Group</span>
+                    <span>{t('nav.newGroup')}</span>
                   </button>
                 </div>
 
@@ -227,14 +227,10 @@ export function Sidebar({ onLogout }: SidebarProps) {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search..."
+              placeholder={t('common.search')}
               className="w-full bg-secondary/50 border border-border/50 rounded-xl pl-10 pr-4 py-2.5 text-sm 
                          focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all"
             />
-            <kbd className="absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-xs text-muted-foreground 
-                          bg-background rounded border border-border/50 font-mono">
-              ⌘K
-            </kbd>
           </div>
         </div>
       )}
@@ -244,11 +240,11 @@ export function Sidebar({ onLogout }: SidebarProps) {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => navigate('/groups')}
+          onClick={goNewGroup}
           className={`btn-primary w-full flex items-center justify-center gap-2 ${isCollapsed ? 'px-3' : ''}`}
         >
           <Plus className="w-5 h-5" />
-          {!isCollapsed && <span>New Group</span>}
+          {!isCollapsed && <span>{t('nav.newGroup')}</span>}
         </motion.button>
       </div>
 
