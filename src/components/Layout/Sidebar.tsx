@@ -17,18 +17,11 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useT } from '@/lib/i18n';
 
 interface SidebarProps {
   onLogout: () => void;
 }
-
-const navItems = [
-  { icon: Home, label: 'Dashboard', path: '/dashboard' },
-  { icon: FolderOpen, label: 'Groups', path: '/groups' },
-  { icon: Sparkles, label: 'AI Review', path: '/ai-review' },
-  { icon: User, label: 'Profile', path: '/profile' },
-  { icon: Settings, label: 'Settings', path: '/settings' },
-];
 
 export function Sidebar({ onLogout }: SidebarProps) {
   const location = useLocation();
@@ -37,6 +30,20 @@ export function Sidebar({ onLogout }: SidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { profile, user } = useAuth();
   const isMobile = useIsMobile();
+  const { t } = useT();
+
+  const navItems = [
+    { icon: Home, label: t('nav.dashboard'), path: '/dashboard' },
+    { icon: FolderOpen, label: t('nav.groups'), path: '/groups' },
+    { icon: Sparkles, label: t('nav.aiReview'), path: '/ai-review' },
+    { icon: User, label: t('nav.profile'), path: '/profile' },
+    { icon: Settings, label: t('nav.settings'), path: '/settings' },
+  ];
+
+  const goNewGroup = () => {
+    navigate('/groups?new=1');
+    setMobileOpen(false);
+  };
 
   const displayName = profile?.full_name || user?.email?.split('@')[0] || 'User';
   const initials = displayName.slice(0, 2).toUpperCase();
