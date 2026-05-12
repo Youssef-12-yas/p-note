@@ -37,13 +37,15 @@ serve(async (req) => {
 
     if (profile?.last_analysis_at) {
       const last = new Date(profile.last_analysis_at).getTime();
-      const sixHours = 6 * 60 * 60 * 1000;
-      if (Date.now() - last < sixHours) {
-        const remainingMin = Math.ceil((sixHours - (Date.now() - last)) / 60000);
-        return json({
-          error: `يمكنك إعادة التحليل بعد ${remainingMin} دقيقة`,
-          rateLimited: true,
-        }, 429);
+      const cooldownMs = 30 * 60 * 1000; // 30 minutes
+      const elapsed = Date.now() - last;
+      if (elapsed < cooldownMs) {
+        const remainingMs = cooldownMs - elapsed;
+        const mins = Math.max(1, Math.ceil(remainingMs / 60000));
+        const msg = mins >= 60
+          ? `يمكنك إعادة التحليل بعد ${Math.ceil(mins / 60)} ساعة / You can re-analyze in ${Math.ceil(mins / 60)} hour(s)`
+          : `يمكنك إعادة التحليل بعد ${mins} دقيقة / You can re-analyze in ${mins} minute(s)`;
+        return json({ error: msg, rateLimited: true, retryAfterMinutes: mins }, 429);
       }
     }
 

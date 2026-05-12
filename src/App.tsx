@@ -10,6 +10,7 @@ import { MainLayout } from './components/Layout/MainLayout';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { GroupsPage } from './components/Groups/GroupsPage';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { LanguageProvider } from './lib/i18n';
 import NotFound from "./pages/NotFound";
 
 // Lazy-load heavier routes
@@ -97,6 +98,7 @@ function AppRoutes() {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
+    <LanguageProvider>
     <AuthProvider>
       <TooltipProvider>
         <Toaster />
@@ -106,6 +108,7 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
+    </LanguageProvider>
   </QueryClientProvider>
 );
 
