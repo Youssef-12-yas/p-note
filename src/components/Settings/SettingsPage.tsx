@@ -57,8 +57,8 @@ export function SettingsPage() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h1 className="text-3xl font-bold mb-2">Settings</h1>
-        <p className="text-muted-foreground">Manage your account and preferences</p>
+        <h1 className="text-2xl md:text-3xl font-bold mb-2">{t('settings.title')}</h1>
+        <p className="text-muted-foreground">{t('settings.subtitle')}</p>
       </motion.div>
 
       {/* Settings sections */}
@@ -71,31 +71,30 @@ export function SettingsPage() {
         >
           <div className="px-6 py-4 border-b border-border/50 flex items-center gap-3">
             <User className="w-5 h-5 text-primary" />
-            <h2 className="font-semibold">Profile</h2>
+            <h2 className="font-semibold">{t('settings.profile')}</h2>
           </div>
 
-          <div className="p-6 space-y-4">
+          <div className="p-4 md:p-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Full Name</label>
+              <label className="block text-sm font-medium mb-2">{t('settings.fullName')}</label>
               <input
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="Your name"
+                placeholder={t('settings.fullName')}
                 className="input-glass w-full max-w-md"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Email</label>
+              <label className="block text-sm font-medium mb-2">{t('settings.email')}</label>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-muted-foreground" />
-                <span className="text-muted-foreground">{user?.email}</span>
+                <span className="text-muted-foreground break-all">{user?.email}</span>
               </div>
             </div>
 
             <motion.button
-              whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleSaveProfile}
               disabled={isSaving}
@@ -106,7 +105,7 @@ export function SettingsPage() {
               ) : (
                 <Save className="w-4 h-4" />
               )}
-              Save Changes
+              {t('settings.saveChanges')}
             </motion.button>
           </div>
         </motion.div>
@@ -118,25 +117,45 @@ export function SettingsPage() {
           transition={{ delay: 0.1 }}
           className="glass rounded-2xl overflow-hidden"
         >
-          <div className="px-6 py-4 border-b border-border/50 flex items-center gap-3">
+          <div className="px-4 md:px-6 py-4 border-b border-border/50 flex items-center gap-3">
             <Palette className="w-5 h-5 text-primary" />
-            <h2 className="font-semibold">Preferences</h2>
+            <h2 className="font-semibold">{t('settings.preferences')}</h2>
           </div>
 
           <div className="divide-y divide-border/50">
-            <div className="px-6 py-4 flex items-center justify-between">
-              <div>
-                <p className="font-medium">Theme</p>
-                <p className="text-sm text-muted-foreground">Dark mode is enabled by default</p>
+            <div className="px-4 md:px-6 py-4 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <p className="font-medium">{t('settings.theme')}</p>
+                <p className="text-sm text-muted-foreground">{t('settings.themeHint')}</p>
               </div>
-              <span className="text-sm text-muted-foreground">Dark</span>
+              <span className="text-sm text-muted-foreground shrink-0">{t('settings.dark')}</span>
             </div>
-            <div className="px-6 py-4 flex items-center justify-between">
-              <div>
-                <p className="font-medium">Language</p>
-                <p className="text-sm text-muted-foreground">Select your preferred language</p>
+            <div className="px-4 md:px-6 py-4 flex items-center justify-between gap-3 flex-wrap">
+              <div className="min-w-0 flex items-center gap-3">
+                <Languages className="w-4 h-4 text-primary shrink-0" />
+                <div>
+                  <p className="font-medium">{t('settings.language')}</p>
+                  <p className="text-sm text-muted-foreground">{t('settings.languageHint')}</p>
+                </div>
               </div>
-              <span className="text-sm text-muted-foreground">English</span>
+              <div className="inline-flex rounded-xl bg-secondary/60 p-1 text-sm shrink-0">
+                <button
+                  onClick={() => setLang('ar')}
+                  className={`px-3 py-1.5 rounded-lg transition-colors ${
+                    lang === 'ar' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  العربية
+                </button>
+                <button
+                  onClick={() => setLang('en')}
+                  className={`px-3 py-1.5 rounded-lg transition-colors ${
+                    lang === 'en' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  English
+                </button>
+              </div>
             </div>
           </div>
         </motion.div>
