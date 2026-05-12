@@ -1,13 +1,6 @@
 import { motion } from 'framer-motion';
-import { 
-  FolderOpen, 
-  FileText, 
-  Sparkles, 
-  Clock, 
-  TrendingUp,
-  Plus,
-  ArrowRight,
-  Brain
+import {
+  FolderOpen, FileText, Sparkles, Clock, Plus, ArrowRight, Brain
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -257,14 +250,18 @@ export function Dashboard() {
             <Brain className="w-6 h-6 text-primary-foreground" />
           </div>
           <div>
-            <h3 className="font-semibold mb-1">AI Insight</h3>
+            <h3 className="font-semibold mb-1">{t('dash.aiInsight')}</h3>
             <p className="text-muted-foreground text-sm mb-3">
-              {groups.length > 0 
-                ? `You have ${groups.length} learning groups. Keep adding notes and use AI Review to validate and expand your knowledge!`
-                : 'Start by creating your first group to organize your learning. AI will help you review and expand your knowledge.'}
+              {groups.length > 0
+                ? (lang === 'ar'
+                    ? `لديك ${groups.length} مجموعة تعلّم. تابع إضافة الملاحظات واستخدم مراجعة الذكاء لتوسيع معرفتك!`
+                    : `You have ${groups.length} learning groups. Keep adding notes and use AI Review to expand your knowledge!`)
+                : (lang === 'ar'
+                    ? 'ابدأ بإنشاء مجموعتك الأولى لتنظيم تعلّمك. سيساعدك الذكاء الاصطناعي على مراجعة معرفتك وتوسيعها.'
+                    : 'Start by creating your first group. AI will help you review and expand your knowledge.')}
             </p>
             <Link to="/ai-review" className="text-sm text-primary hover:underline flex items-center gap-1">
-              Get personalized recommendations <ArrowRight className="w-4 h-4" />
+              {lang === 'ar' ? 'احصل على توصيات شخصية' : 'Get personalized recommendations'} <ArrowRight className="w-4 h-4 rtl:rotate-180" />
             </Link>
           </div>
         </div>
