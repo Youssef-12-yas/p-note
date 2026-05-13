@@ -46,20 +46,24 @@ const slides = [
 ];
 
 export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
+  const { t, lang, setLang, dir } = useT();
+  const [step, setStep] = useState<'lang' | 'intro' | 'slides'>(() =>
+    localStorage.getItem('ynote-lang-picked') === '1' ? 'intro' : 'lang'
+  );
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [showIntro, setShowIntro] = useState(true);
+
+  const handlePickLang = (l: 'ar' | 'en') => {
+    setLang(l);
+    localStorage.setItem('ynote-lang-picked', '1');
+    setStep('intro');
+  };
 
   const handleNext = () => {
-    if (currentSlide < slides.length - 1) {
-      setCurrentSlide(currentSlide + 1);
-    } else {
-      onComplete();
-    }
+    if (currentSlide < slides.length - 1) setCurrentSlide(currentSlide + 1);
+    else onComplete();
   };
 
-  const handleSkip = () => {
-    onComplete();
-  };
+  const handleSkip = () => onComplete();
 
   return (
     <div className="fixed inset-0 bg-background overflow-hidden">
