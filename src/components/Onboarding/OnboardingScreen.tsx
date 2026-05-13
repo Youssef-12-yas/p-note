@@ -115,7 +115,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
               transition={{ delay: 0.4, duration: 0.5 }}
               className="text-5xl md:text-7xl font-bold gradient-text mb-4"
             >
-              P-Note
+              P-Note — AI-powered thinking companion
             </motion.h1>
 
             {/* Tagline */}
@@ -222,10 +222,11 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
             <div className="flex flex-col items-center gap-8">
               {/* Progress dots */}
               <div className="flex gap-2">
-                {slides.map((_, index) => (
+                {slides.map((slide, index) => (
                   <motion.button
                     key={index}
                     onClick={() => setCurrentSlide(index)}
+                    aria-label={`Go to slide ${index + 1}: ${slide.title}`}
                     className={`w-2 h-2 rounded-full transition-all duration-300 ${
                       index === currentSlide 
                         ? 'w-8 bg-primary' 

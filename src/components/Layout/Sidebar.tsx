@@ -71,7 +71,7 @@ export function Sidebar({ onLogout }: SidebarProps) {
           </Link>
           <Link to="/profile" className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/50 to-accent/50 flex items-center justify-center overflow-hidden ring-1 ring-border/40">
             {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="me" className="w-full h-full object-cover" />
+              <img src={profile.avatar_url} alt="User profile photo" className="w-full h-full object-cover" />
             ) : (
               <span className="text-xs font-semibold">{initials}</span>
             )}
@@ -285,7 +285,7 @@ export function Sidebar({ onLogout }: SidebarProps) {
         <div className={`flex items-center gap-3 ${isCollapsed ? 'justify-center' : ''}`}>
           <Link to="/profile" className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/50 to-accent/50 flex items-center justify-center shrink-0 overflow-hidden ring-1 ring-border/40 hover:ring-primary/60 transition-all">
             {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="me" className="w-full h-full object-cover" />
+              <img src={profile.avatar_url} alt="User profile photo" className="w-full h-full object-cover" />
             ) : (
               <span className="text-sm font-semibold">{initials}</span>
             )}

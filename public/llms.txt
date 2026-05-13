@@ -1,0 +1,15 @@
+# P-Note
+
+> P-Note is an AI-powered thinking and note-taking companion that verifies, corrects, and expands your knowledge as you write.
+
+P-Note organizes learning into Groups → Lessons → Notes. As you take notes, an AI reviewer checks your understanding, fixes mistakes, and generates supplemental notes so you can level up faster. Progress is tracked over time with an AI-driven level and XP system.
+
+## Pages
+
+- [Home](/): Landing and onboarding for new users.
+- [Sign in](/auth): Email and Google authentication.
+- [Dashboard](/dashboard): Overview of your learning activity and stats.
+- [Groups](/groups): Browse and manage your knowledge groups.
+- [AI Review](/ai-review): AI-powered review of your notes with corrections and expansions.
+- [Profile](/profile): Your level, XP, progress chart, and AI progress analysis.
+- [Settings](/settings): Language (English / Arabic) and account settings.

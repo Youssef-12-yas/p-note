@@ -61,7 +61,7 @@ export function AvatarUpload({ size = 120 }: AvatarUploadProps) {
         className="relative w-full h-full rounded-full overflow-hidden bg-gradient-to-br from-primary/40 to-accent/40 flex items-center justify-center group ring-2 ring-border/40 hover:ring-primary/60 transition-all"
       >
         {profile?.avatar_url ? (
-          <img src={profile.avatar_url} alt="avatar" className="w-full h-full object-cover" />
+          <img src={profile.avatar_url} alt="User profile photo" className="w-full h-full object-cover" />
         ) : (
           <span className="text-3xl font-bold text-foreground/80">{initials}</span>
         )}

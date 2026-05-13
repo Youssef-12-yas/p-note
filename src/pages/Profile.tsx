@@ -8,6 +8,7 @@ import { LevelBadge } from '@/components/Profile/LevelBadge';
 import { ProgressChart } from '@/components/Profile/ProgressChart';
 import { AIAnalysisCard } from '@/components/Profile/AIAnalysisCard';
 import { toast } from 'sonner';
+import { SEO } from '@/components/SEO';
 
 export default function ProfilePage() {
   const { user, profile, updateProfile } = useAuth();
@@ -37,6 +38,7 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6">
+      <SEO title="Profile | P-Note" description="Your P-Note profile: AI-evaluated level, XP, activity chart, and progress analysis." path="/profile" />
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}

@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 import { useGroups } from '@/hooks/useGroups';
 import { useLessons } from '@/hooks/useLessons';
 import { useGenerateAINote } from '@/hooks/useNotes';
+import { SEO } from '@/components/SEO';
 
 export function AIReviewPage() {
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
@@ -61,6 +62,7 @@ export function AIReviewPage() {
 
   return (
     <div>
+      <SEO title="AI Review | P-Note" description="Generate AI-powered review notes that verify, correct, and expand your knowledge." path="/ai-review" />
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

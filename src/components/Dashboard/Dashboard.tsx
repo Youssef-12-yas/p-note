@@ -10,6 +10,7 @@ import { useStats } from '@/hooks/useStats';
 import { formatDistanceToNow } from 'date-fns';
 import { ar as arLocale } from 'date-fns/locale';
 import { useT } from '@/lib/i18n';
+import { SEO } from '@/components/SEO';
 
 const gradientColors = [
   'from-blue-500 to-cyan-500',
@@ -46,6 +47,7 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen">
+      <SEO title="Dashboard | P-Note" description="Your learning overview: groups, lessons, recent notes and AI activity in P-Note." path="/dashboard" />
       {/* Header */}
       <header className="mb-8">
         <motion.div
