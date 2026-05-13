@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Brain, Mail, Lock, User, ArrowRight, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { SEO } from '@/components/SEO';
 
 export function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -46,6 +47,7 @@ export function AuthPage() {
 
   return (
     <div className="min-h-screen flex">
+      <SEO title="Sign in | P-Note" description="Sign in or create your P-Note account to start AI-assisted note-taking." path="/auth" />
       {/* Left side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
         {/* Gradient background */}

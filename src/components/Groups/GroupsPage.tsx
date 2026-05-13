@@ -6,6 +6,7 @@ import {
 import { Link, useSearchParams } from 'react-router-dom';
 import { useGroups, useCreateGroup, useDeleteGroup } from '@/hooks/useGroups';
 import { useT } from '@/lib/i18n';
+import { SEO } from '@/components/SEO';
 
 const gradientColors = [
   'from-blue-500 to-cyan-500',
@@ -67,6 +68,7 @@ export function GroupsPage() {
 
   return (
     <div>
+      <SEO title="Groups | P-Note" description="Organize your knowledge into groups and lessons. Create, search, and manage your study spaces." path="/groups" />
       {/* Header — stacked on mobile, row on md+ */}
       <div className="flex flex-col gap-4 mb-6 md:mb-8 md:flex-row md:items-center md:justify-between">
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>

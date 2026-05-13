@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { useT } from '@/lib/i18n';
+import { SEO } from '@/components/SEO';
 
 export function SettingsPage() {
   const { user, profile, updateProfile, signOut } = useAuth();
@@ -51,6 +52,7 @@ export function SettingsPage() {
 
   return (
     <div>
+      <SEO title="Settings | P-Note" description="Manage your P-Note account, language (English / Arabic), notifications, and preferences." path="/settings" />
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
