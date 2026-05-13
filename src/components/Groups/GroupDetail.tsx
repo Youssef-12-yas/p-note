@@ -138,6 +138,7 @@ export function GroupDetail() {
           <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
           <input
             type="text"
+            aria-label={t('lesson.searchPlaceholder')}
             placeholder={t('lesson.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
