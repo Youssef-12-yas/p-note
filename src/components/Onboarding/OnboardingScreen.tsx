@@ -66,7 +66,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
   const handleSkip = () => onComplete();
 
   return (
-    <div className="fixed inset-0 bg-background overflow-hidden">
+    <div className="fixed inset-0 bg-background overflow-hidden" dir={dir}>
       {/* Animated background */}
       <div className="absolute inset-0">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse-glow" />
@@ -74,8 +74,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-primary/5 to-accent/5 rounded-full blur-3xl" />
       </div>
 
-      {/* Grid pattern overlay */}
-      <div 
+      <div
         className="absolute inset-0 opacity-[0.02]"
         style={{
           backgroundImage: `radial-gradient(circle at 1px 1px, hsl(var(--foreground)) 1px, transparent 0)`,
@@ -84,7 +83,48 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
       />
 
       <AnimatePresence mode="wait">
-        {showIntro ? (
+        {step === 'lang' ? (
+          <motion.div
+            key="lang"
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            transition={{ duration: 0.4 }}
+            className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6"
+          >
+            <div className="w-20 h-20 mb-6 rounded-3xl bg-gradient-to-br from-primary to-accent flex items-center justify-center glow">
+              <Languages className="w-10 h-10 text-primary-foreground" />
+            </div>
+            <h1 className="text-3xl md:text-5xl font-bold mb-3 gradient-text text-center">
+              {t('onb.pickLang')} / Choose your language
+            </h1>
+            <p className="text-base md:text-lg text-muted-foreground mb-10 text-center max-w-md">
+              {t('onb.pickLangSub')}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => handlePickLang('ar')}
+                className={`flex-1 glass-hover rounded-2xl p-6 text-center border-2 transition-colors ${lang === 'ar' ? 'border-primary' : 'border-transparent'}`}
+              >
+                <div className="text-3xl mb-2">🇸🇦</div>
+                <div className="text-xl font-bold">العربية</div>
+                <div className="text-sm text-muted-foreground mt-1">من اليمين لليسار</div>
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => handlePickLang('en')}
+                className={`flex-1 glass-hover rounded-2xl p-6 text-center border-2 transition-colors ${lang === 'en' ? 'border-primary' : 'border-transparent'}`}
+              >
+                <div className="text-3xl mb-2">🇬🇧</div>
+                <div className="text-xl font-bold">English</div>
+                <div className="text-sm text-muted-foreground mt-1">Left to right</div>
+              </motion.button>
+            </div>
+          </motion.div>
+        ) : step === 'intro' ? (
           <motion.div
             key="intro"
             initial={{ opacity: 0 }}
