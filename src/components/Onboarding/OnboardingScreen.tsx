@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Sparkles, CheckCircle, Lightbulb, BookOpen, ArrowRight } from 'lucide-react';
+import { Brain, Sparkles, CheckCircle, Lightbulb, BookOpen, ArrowRight, Languages } from 'lucide-react';
+import { useT } from '@/lib/i18n';
 
 interface OnboardingScreenProps {
   onComplete: () => void;
