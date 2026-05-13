@@ -45,9 +45,9 @@ export function Dashboard() {
 
   const recentGroups = groups.slice(0, 4);
 
-    <>
-      <SEO title="Dashboard | P-Note" description="Your learning overview: groups, lessons, recent notes and AI activity in P-Note." path="/dashboard" />
+  return (
     <div className="min-h-screen">
+      <SEO title="Dashboard | P-Note" description="Your learning overview: groups, lessons, recent notes and AI activity in P-Note." path="/dashboard" />
       {/* Header */}
       <header className="mb-8">
         <motion.div
