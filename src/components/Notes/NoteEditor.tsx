@@ -25,6 +25,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import { VerificationPanel } from './VerificationPanel';
+import { useT } from '@/lib/i18n';
 
 // Debounce utility to prevent freezing
 function useDebounce<T extends (...args: any[]) => any>(
@@ -57,6 +58,7 @@ function useDebounce<T extends (...args: any[]) => any>(
 }
 
 export function NoteEditor() {
+  const { t } = useT();
   const { noteId } = useParams();
   const navigate = useNavigate();
   const [content, setContent] = useState('');
@@ -145,7 +147,7 @@ export function NoteEditor() {
 
       // Trigger AI verification after manual save (only for user notes with content)
       if (!note.is_ai_generated && content.trim().length > 0) {
-        toast.success('Saved! AI is analyzing your note...');
+        toast.success(t('note.aiAnalyzing'));
         setVerificationResult(null);
         verifyNote.mutate(
           {
@@ -155,20 +157,16 @@ export function NoteEditor() {
             lessonId: note.lesson_id,
           },
           {
-            onSuccess: (data) => {
-              setVerificationResult(data.analysis);
-            },
-            onError: (err) => {
-              console.error('AI verify failed:', err);
-            },
+            onSuccess: (data) => setVerificationResult(data.analysis),
+            onError: (err) => console.error('AI verify failed:', err),
           }
         );
       } else {
-        toast.success('Note saved!');
+        toast.success(t('note.saved'));
       }
     } catch (err) {
       console.error('Save failed:', err);
-      toast.error('Failed to save note');
+      toast.error(t('note.saveFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -176,7 +174,7 @@ export function NoteEditor() {
 
   const handleDelete = async () => {
     if (!note) return;
-    if (confirm('Are you sure you want to delete this note?')) {
+    if (confirm(t('note.confirmDelete'))) {
       await deleteNote.mutateAsync({
         noteId: note.id,
         lessonId: note.lesson_id,
@@ -238,9 +236,9 @@ export function NoteEditor() {
   if (!note) {
     return (
       <div className="text-center py-16">
-        <h2 className="text-xl font-semibold mb-2">Note not found</h2>
+        <h2 className="text-xl font-semibold mb-2">{t('note.notFound')}</h2>
         <Link to="/groups" className="text-primary hover:underline">
-          Back to Groups
+          {t('common.back')}
         </Link>
       </div>
     );
@@ -267,7 +265,7 @@ export function NoteEditor() {
               value={title}
               onChange={handleTitleChange}
               className="text-xl sm:text-2xl font-bold bg-transparent border-none outline-none focus:ring-0 w-full"
-              placeholder="Note title..."
+              placeholder={t('note.titlePlaceholder')}
               readOnly={note.is_ai_generated}
             />
             <p className="text-xs sm:text-sm text-muted-foreground flex items-center gap-2 truncate">
@@ -285,8 +283,8 @@ export function NoteEditor() {
         <div className="flex items-center gap-2 shrink-0 ml-auto sm:ml-0">
           <span className="text-xs sm:text-sm text-muted-foreground hidden sm:inline">
             {hasUnsavedChanges
-              ? 'Unsaved'
-              : `Saved ${formatDistanceToNow(new Date(note.updated_at), { addSuffix: true })}`}
+              ? t('note.unsaved')
+              : `${t('note.savedAgo')} ${formatDistanceToNow(new Date(note.updated_at), { addSuffix: true })}`}
           </span>
 
           {/* Preview toggle */}
@@ -297,7 +295,7 @@ export function NoteEditor() {
             className={`p-2 rounded-lg transition-colors ${
               isPreviewMode ? 'bg-primary/10 text-primary' : 'hover:bg-secondary text-muted-foreground'
             }`}
-            title={isPreviewMode ? 'Edit mode' : 'Preview mode'}
+            title={isPreviewMode ? t('note.edit') : t('note.preview')}
           >
             {isPreviewMode ? <Edit3 className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           </motion.button>
@@ -311,7 +309,7 @@ export function NoteEditor() {
               className="btn-secondary flex items-center gap-2 disabled:opacity-60 px-3 py-2 sm:px-6 sm:py-3"
             >
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              <span className="hidden sm:inline">Save</span>
+              <span className="hidden sm:inline">{t('note.save')}</span>
             </motion.button>
           )}
 
@@ -386,8 +384,9 @@ export function NoteEditor() {
                 ref={textareaRef}
                 value={content}
                 onChange={handleContentChange}
-                className="flex-1 bg-transparent border-none outline-none resize-none font-mono text-sm leading-relaxed"
-                placeholder="Start writing your notes..."
+                className="flex-1 bg-transparent border-none outline-none resize-none text-base leading-7 tracking-[0.005em]"
+                placeholder={t('note.startWriting')}
+                spellCheck={false}
               />
             </motion.div>
           )}
