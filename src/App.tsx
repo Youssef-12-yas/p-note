@@ -51,11 +51,25 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+const ProductTour = lazy(() =>
+  import('./components/Tour/ProductTour').then(m => ({ default: m.ProductTour }))
+);
+
 function AppRoutes() {
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(() => {
     return localStorage.getItem('ynote-onboarding') === 'complete';
   });
-  const { signOut } = useAuth();
+  const { signOut, user, isLoading } = useAuth();
+  const [showTour, setShowTour] = useState(false);
+
+  // Show product tour once per TOUR_VERSION after the user is signed in
+  // and has finished the splash onboarding.
+  useEffect(() => {
+    if (!hasSeenOnboarding || isLoading || !user) return;
+    import('./components/Tour/ProductTour').then(({ shouldShowTour }) => {
+      if (shouldShowTour()) setShowTour(true);
+    });
+  }, [hasSeenOnboarding, isLoading, user]);
 
   const handleOnboardingComplete = () => {
     localStorage.setItem('ynote-onboarding', 'complete');
@@ -79,20 +93,28 @@ function AppRoutes() {
   );
 
   return (
-    <Routes>
-      <Route path="/auth" element={<AuthRoute><AuthPage /></AuthRoute>} />
+    <>
+      <Routes>
+        <Route path="/auth" element={<AuthRoute><AuthPage /></AuthRoute>} />
 
-      <Route path="/dashboard" element={wrap(<Dashboard />)} />
-      <Route path="/groups" element={wrap(<GroupsPage />)} />
-      <Route path="/groups/:groupId" element={wrap(<GroupDetail />)} />
-      <Route path="/notes/:noteId" element={wrap(<NoteEditor />)} />
-      <Route path="/ai-review" element={wrap(<AIReviewPage />)} />
-      <Route path="/profile" element={wrap(<ProfilePage />)} />
-      <Route path="/settings" element={wrap(<SettingsPage />)} />
+        <Route path="/dashboard" element={wrap(<Dashboard />)} />
+        <Route path="/groups" element={wrap(<GroupsPage />)} />
+        <Route path="/groups/:groupId" element={wrap(<GroupDetail />)} />
+        <Route path="/notes/:noteId" element={wrap(<NoteEditor />)} />
+        <Route path="/ai-review" element={wrap(<AIReviewPage />)} />
+        <Route path="/profile" element={wrap(<ProfilePage />)} />
+        <Route path="/settings" element={wrap(<SettingsPage />)} />
 
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+
+      {showTour && (
+        <Suspense fallback={null}>
+          <ProductTour onClose={() => setShowTour(false)} />
+        </Suspense>
+      )}
+    </>
   );
 }
 
