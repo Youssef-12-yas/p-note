@@ -64,9 +64,7 @@ export function Sidebar({ onLogout }: SidebarProps) {
             <Menu className="w-5 h-5" />
           </button>
           <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-              <Brain className="w-4 h-4 text-primary-foreground" />
-            </div>
+            <img src={logo} alt="P-Note" className="w-7 h-7 rounded-lg object-contain" />
             <span className="text-base font-bold gradient-text">P-Note</span>
           </Link>
           <Link to="/profile" className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/50 to-accent/50 flex items-center justify-center overflow-hidden ring-1 ring-border/40">
