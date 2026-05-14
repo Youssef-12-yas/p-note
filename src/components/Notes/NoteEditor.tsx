@@ -384,9 +384,10 @@ export function NoteEditor() {
                 ref={textareaRef}
                 value={content}
                 onChange={handleContentChange}
-                className="flex-1 bg-transparent border-none outline-none resize-none text-base leading-7 tracking-[0.005em]"
+                className="flex-1 w-full max-w-3xl mx-auto bg-transparent border-none outline-none resize-none text-[17px] sm:text-lg leading-8 tracking-[0.005em] placeholder:text-muted-foreground/60"
                 placeholder={t('note.startWriting')}
                 spellCheck={false}
+                autoFocus
               />
             </motion.div>
           )}
