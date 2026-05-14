@@ -120,9 +120,7 @@ export function Sidebar({ onLogout }: SidebarProps) {
                 {/* Close */}
                 <div className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shrink-0">
-                      <Brain className="w-5 h-5 text-primary-foreground" />
-                    </div>
+                    <img src={logo} alt="P-Note" className="w-10 h-10 rounded-xl object-contain shrink-0" />
                     <span className="text-xl font-bold gradient-text">P-Note</span>
                   </div>
                   <button onClick={closeMobile} className="p-2 rounded-lg hover:bg-secondary">
@@ -204,9 +202,7 @@ export function Sidebar({ onLogout }: SidebarProps) {
     >
       {/* Logo */}
       <div className="p-6 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shrink-0">
-          <Brain className="w-5 h-5 text-primary-foreground" />
-        </div>
+        <img src={logo} alt="P-Note" className="w-10 h-10 rounded-xl object-contain shrink-0" />
         {!isCollapsed && (
           <motion.span
             initial={{ opacity: 0 }}
