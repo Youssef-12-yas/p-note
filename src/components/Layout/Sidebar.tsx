@@ -1,6 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Brain, 
   Home, 
   FolderOpen, 
   Settings, 
@@ -18,6 +17,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useT } from '@/lib/i18n';
+import logo from '@/assets/logo.png';
 
 interface SidebarProps {
   onLogout: () => void;
