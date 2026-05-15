@@ -1,23 +1,6 @@
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowLeft, 
-  Save, 
-  Sparkles, 
-  Code, 
-  Bold, 
-  Italic, 
-  List, 
-  ListOrdered,
-  Link2,
-  Quote,
-  Heading1,
-  Heading2,
-  Loader2,
-  Trash2,
-  Eye,
-  Edit3
-} from 'lucide-react';
+import { ArrowLeft, Save, Sparkles, Loader2, Trash2, Eye, Edit3 } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useNote, useUpdateNote, useDeleteNote } from '@/hooks/useNotes';
 import { useVerifyNote, type VerificationResult } from '@/hooks/useVerifyNote';
@@ -25,6 +8,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import { VerificationPanel } from './VerificationPanel';
+import { RichEditor } from './RichEditor';
 import { useT } from '@/lib/i18n';
 
 // Debounce utility to prevent freezing
@@ -67,7 +51,7 @@ export function NoteEditor() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [verificationResult, setVerificationResult] = useState<VerificationResult | null>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  
   const initialLoadRef = useRef(true);
 
   const { data: note, isLoading } = useNote(noteId);
@@ -111,8 +95,7 @@ export function NoteEditor() {
   const debouncedSave = useDebounce(saveNote, 1500);
 
   const handleContentChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const newContent = e.target.value;
+    (newContent: string) => {
       setContent(newContent);
       setHasUnsavedChanges(true);
       if (noteId) {
@@ -183,47 +166,7 @@ export function NoteEditor() {
     }
   };
 
-  const insertText = useCallback(
-    (before: string, after: string) => {
-      const textarea = textareaRef.current;
-      if (!textarea) return;
-
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const selectedText = content.substring(start, end);
-      const newContent =
-        content.substring(0, start) + before + selectedText + after + content.substring(end);
-
-      setContent(newContent);
-      setHasUnsavedChanges(true);
-
-      if (noteId) {
-        debouncedSave(noteId, title, newContent);
-      }
-
-      // Restore focus and selection
-      requestAnimationFrame(() => {
-        textarea.focus();
-        textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
-      });
-    },
-    [content, noteId, title, debouncedSave]
-  );
-
-  const toolbarButtons = useMemo(
-    () => [
-      { icon: Bold, label: 'Bold', action: () => insertText('**', '**') },
-      { icon: Italic, label: 'Italic', action: () => insertText('*', '*') },
-      { icon: Heading1, label: 'Heading 1', action: () => insertText('# ', '') },
-      { icon: Heading2, label: 'Heading 2', action: () => insertText('## ', '') },
-      { icon: List, label: 'Bullet List', action: () => insertText('- ', '') },
-      { icon: ListOrdered, label: 'Numbered List', action: () => insertText('1. ', '') },
-      { icon: Quote, label: 'Quote', action: () => insertText('> ', '') },
-      { icon: Code, label: 'Code', action: () => insertText('```\n', '\n```') },
-      { icon: Link2, label: 'Link', action: () => insertText('[', '](url)') },
-    ],
-    [insertText]
-  );
+  // toolbar lives inside RichEditor
 
   if (isLoading) {
     return (
