@@ -1,0 +1,34 @@
+workflows:
+  android-build:
+    name: Android APK Build (Expo)
+    max_build_duration: 60
+
+    environment:
+      node: 18
+      java: 17
+
+    cache:
+      cache_paths:
+        - node_modules
+        - ~/.npm
+
+    scripts:
+      - name: Install dependencies
+        script: npm install
+
+      - name: Install Expo CLI
+        script: npm install -g expo-cli
+
+      - name: Prebuild project
+        script: npx expo prebuild
+
+      - name: Build Android APK
+        script: cd android && ./gradlew assembleRelease
+
+    artifacts:
+      - android/app/build/outputs/**/*.apk
+
+    publishing:
+      email:
+        recipients:
+          - your-email@example.com
