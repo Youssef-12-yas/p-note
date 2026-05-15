@@ -54,6 +54,9 @@ function AuthRoute({ children }: { children: React.ReactNode }) {
 const ProductTour = lazy(() =>
   import('./components/Tour/ProductTour').then(m => ({ default: m.ProductTour }))
 );
+const WhatsNewModal = lazy(() =>
+  import('./components/WhatsNew/WhatsNewModal').then(m => ({ default: m.WhatsNewModal }))
+);
 
 function AppRoutes() {
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(() => {
@@ -61,6 +64,7 @@ function AppRoutes() {
   });
   const { signOut, user, isLoading } = useAuth();
   const [showTour, setShowTour] = useState(false);
+  const [showWhatsNew, setShowWhatsNew] = useState(false);
 
   // Show product tour once per TOUR_VERSION after the user is signed in
   // and has finished the splash onboarding.
@@ -69,6 +73,11 @@ function AppRoutes() {
     import('./components/Tour/ProductTour').then(({ shouldShowTour }) => {
       if (shouldShowTour()) setShowTour(true);
     });
+    import('./components/WhatsNew/WhatsNewModal').then(({ shouldShowWhatsNew }) => {
+      if (shouldShowWhatsNew()) setShowWhatsNew(true);
+    });
+    // Init native push notifications on Android (no-op on web)
+    import('./lib/notifications').then(({ initNotifications }) => initNotifications());
   }, [hasSeenOnboarding, isLoading, user]);
 
   const handleOnboardingComplete = () => {
@@ -112,6 +121,11 @@ function AppRoutes() {
       {showTour && (
         <Suspense fallback={null}>
           <ProductTour onClose={() => setShowTour(false)} />
+        </Suspense>
+      )}
+      {!showTour && showWhatsNew && (
+        <Suspense fallback={null}>
+          <WhatsNewModal onClose={() => setShowWhatsNew(false)} />
         </Suspense>
       )}
     </>
