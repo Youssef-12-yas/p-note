@@ -1,6 +1,6 @@
 workflows:
   android-build:
-    name: Android APK Build (Expo)
+    name: Android APK Build (Capacitor)
     max_build_duration: 60
 
     environment:
@@ -10,25 +10,19 @@ workflows:
     cache:
       cache_paths:
         - node_modules
-        - ~/.npm
 
     scripts:
       - name: Install dependencies
         script: npm install
 
-      - name: Install Expo CLI
-        script: npm install -g expo-cli
+      - name: Build project
+        script: npm run build
 
-      - name: Prebuild project
-        script: npx expo prebuild
+      - name: Sync Capacitor
+        script: npx cap sync android
 
-      - name: Build Android APK
+      - name: Build APK
         script: cd android && ./gradlew assembleRelease
 
     artifacts:
       - android/app/build/outputs/**/*.apk
-
-    publishing:
-      email:
-        recipients:
-          - your-email@example.com
