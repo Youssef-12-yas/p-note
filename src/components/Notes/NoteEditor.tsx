@@ -272,35 +272,12 @@ export function NoteEditor() {
         <VerificationPanel result={verificationResult} isLoading={verifyNote.isPending} />
       )}
 
-      {/* Toolbar */}
-      {!note.is_ai_generated && !isPreviewMode && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="glass rounded-xl p-2 flex items-center gap-1 mb-4 overflow-x-auto"
-        >
-          {toolbarButtons.map((button) => (
-            <motion.button
-              key={button.label}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={button.action}
-              className="p-2 rounded-lg hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground"
-              title={button.label}
-            >
-              <button.icon className="w-4 h-4" />
-            </motion.button>
-          ))}
-        </motion.div>
-      )}
-
       {/* Editor / Preview */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className={`flex-1 glass rounded-2xl overflow-hidden flex flex-col ${
+        className={`flex-1 glass rounded-2xl overflow-hidden flex flex-col p-4 sm:p-6 ${
           note.is_ai_generated ? 'ai-note-container' : ''
         }`}
       >
@@ -311,7 +288,7 @@ export function NoteEditor() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex-1 overflow-auto p-4 sm:p-6"
+              className="flex-1 overflow-auto"
             >
               <MarkdownRenderer content={content} className="note-content" />
             </motion.div>
@@ -321,15 +298,12 @@ export function NoteEditor() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex-1 p-4 sm:p-6 flex flex-col"
+              className="flex-1 flex flex-col"
             >
-              <textarea
-                ref={textareaRef}
+              <RichEditor
                 value={content}
                 onChange={handleContentChange}
-                className="flex-1 w-full max-w-3xl mx-auto bg-transparent border-none outline-none resize-none text-[17px] sm:text-lg leading-8 tracking-[0.005em] placeholder:text-muted-foreground/60"
                 placeholder={t('note.startWriting')}
-                spellCheck={false}
                 autoFocus
               />
             </motion.div>
